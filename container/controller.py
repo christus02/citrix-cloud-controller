@@ -73,11 +73,11 @@ def metadata_project():
 
 @app.route("/metadata/zone")
 def metadata_zone():
-    return jsonify(project=metadata_call('zone'))
+    return jsonify(zone=metadata_call('zone'))
 
 @app.route("/metadata/region")
 def metadata_region():
-    return jsonify(project=metadata_call('region'))
+    return jsonify(region=metadata_call('region'))
 
 @app.route("/forwardingrules/exists/name/<name>")
 def fowardingrules_name_exists(name):

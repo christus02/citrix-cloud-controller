@@ -15,7 +15,6 @@ When CIC receives a new Ingress event, it should perform the below steps:
 7. Add new annotations in the Ingress for DNS updation - `ingress.citrix.com/cloud: gcp` and `ingress.citrix.com/update-cloud-dns: true`
 8. If these annotations are present, update the `Host` field provided in the Ingress with the Public IP allocated by `citrix-cloud-controller` in the Cloud Provider DNS
 
-
 # Annotations for Citrix Cloud Controller
 
 1. `ingress.citrix.com/cloud`
