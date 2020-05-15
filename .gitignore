@@ -2,3 +2,4 @@
 credentials/
 *.swp
 *.swo
+container/__pycache__/
