@@ -60,5 +60,5 @@ def api_delete_forwarding_rule(name):
 		return jsonify(False)
 	return (jsonify(targetinstances.delete(name) and forwardingrules.delete(name)))
 
-if __name__ == '__main__':
+def run_server:
 	app.run(host='0.0.0.0', port=FLASK_PORT)
