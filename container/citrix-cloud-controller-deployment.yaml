@@ -1,0 +1,22 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: citrix-cloud-controller
+  labels:
+      name: citrix-cloud-controller
+spec:
+  selector:
+    matchLabels:
+      app: citrix-cloud-controller
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: citrix-cloud-controller
+    spec:
+      containers:
+      - name: ccc
+        image: asia.gcr.io/kops-automation/citrix-cloud-controller:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5001

@@ -1,0 +1,3 @@
+sudo docker build -t citrix-cloud-controller .
+sudo docker tag citrix-cloud-controller:latest asia.gcr.io/kops-automation/citrix-cloud-controller:v1
+sudo docker push asia.gcr.io/kops-automation/citrix-cloud-controller:v1
