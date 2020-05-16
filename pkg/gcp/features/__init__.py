@@ -3,3 +3,4 @@ from . import helper
 from . import instances
 from . import metadata
 from . import targetinstances
+from . import dnszones
