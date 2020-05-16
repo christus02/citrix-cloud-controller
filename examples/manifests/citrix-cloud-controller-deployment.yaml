@@ -16,10 +16,10 @@ spec:
     spec:
       containers:
       - name: ccc
-        image: asia.gcr.io/kops-automation/citrix-cloud-controller:v2
+        image: citrix-cloud-controller
         imagePullPolicy: Always
         ports:
-        - containerPort: 5001
+        - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
@@ -28,6 +28,6 @@ metadata:
 spec:
   ports:
   - port: 80
-    targetPort: 5001
+    targetPort: 8080
   selector:
     app: citrix-cloud-controller
