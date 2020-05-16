@@ -164,9 +164,9 @@ def api_delete_forwarding_rule(request):
 def api_records_list_create():
     if request.method == "GET":
         a_records = []
-        zones = features.dnszones.get_all_dns_zones()
+        zones = features.clouddns.get_all_dns_zones()
         for zone in zones:
-            records = features.dnszones.get_all_dns_records(zone['name'])
+            records = features.clouddns.get_all_dns_records(zone['name'])
             for record in records:
                 if record['type'] == "A":
                     a_records.append(record)
@@ -181,13 +181,13 @@ def api_records_list_create():
         hostname = data['hostname']
         hostname_details  = tldextract.extract(hostname)
         domain = str(hostname_details[1] + "." + hostname_details[2])
-        zone = features.dnszones.zone_exists(domain)
+        zone = features.clouddns.zone_exists(domain)
         if not zone:
             return (jsonify(status=False, msg='DNS Zone does not exits for domain ' + domain))
         else:
-            record = features.dnszones.record_exists_in_zone(zone['name'], hostname, 'A')
+            record = features.clouddns.record_exists_in_zone(zone['name'], hostname, 'A')
             if not record:
-                response = features.dnszones.create_dns_records(zone['name'], hostname, ip)
+                response = features.clouddns.create_dns_records(zone['name'], hostname, ip)
                 return (jsonify(response))
             else:
                 return (jsonify({'record': record, 'msg': 'DNS Record already exits for hostname ' + hostname}))
@@ -197,11 +197,11 @@ def api_records_get_delete(item):
     if request.method == "GET":
         hostname_details  = tldextract.extract(item)
         domain = str(hostname_details[1] + "." + hostname_details[2])
-        zone = features.dnszones.zone_exists(domain)
+        zone = features.clouddns.zone_exists(domain)
         if not zone:
             return (jsonify(status=False, msg='DNS Record doesn\'t exist for hostname ' + item))
         else:
-            record = features.dnszones.record_exists_in_zone(zone['name'], item, "A")
+            record = features.clouddns.record_exists_in_zone(zone['name'], item, "A")
             if record:
                 return (jsonify(record))
             else:
@@ -209,13 +209,13 @@ def api_records_get_delete(item):
     if request.method == "DELETE":
         hostname_details  = tldextract.extract(item)
         domain = str(hostname_details[1] + "." + hostname_details[2])
-        zone = features.dnszones.zone_exists(domain)
+        zone = features.clouddns.zone_exists(domain)
         if not zone:
             return (jsonify(True))
         else:
-            record = features.dnszones.record_exists_in_zone(zone['name'], item, "A")
+            record = features.clouddns.record_exists_in_zone(zone['name'], item, "A")
             if record:
-                features.dnszones.delete_dns_records(zone['name'], item, record['ip'], record['type'], record['ttl'])
+                features.clouddns.delete_dns_records(zone['name'], item, record['ip'], record['type'], record['ttl'])
                 return (jsonify(True))
             else:
                 return (jsonify(True))
