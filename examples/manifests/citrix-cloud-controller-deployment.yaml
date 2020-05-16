@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: ccc
-        image: citrix-cloud-controller
+        image: raghulc/citrix-cloud-controller:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
