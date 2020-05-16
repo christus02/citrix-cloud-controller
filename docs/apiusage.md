@@ -129,8 +129,8 @@ curl http://localhost:5001/forwardingrules/get
 {"IPAddress":"35.244.11.249","IPProtocol":"UDP","name":"ipsec-cluster-1-vpx","portRange":"1-65535","target":"target-cluster-1-vpx"},
 {"IPAddress":"35.200.182.103","IPProtocol":"UDP","name":"ipsec-cluster-2-vpx","portRange":"1-65535","target":"target-cluster-2-vpx"},
 {"IPAddress":"35.200.132.201","IPProtocol":"TCP","name":"raghulc-1","portRange":"1-65535","target":"raghulc-1"}]
-
 ```
+
 ```bash
 curl -X GET http://localhost:5001/forwardingrules/get --data-urlencode 'ip=35.200.132.201'
 ```
@@ -138,3 +138,30 @@ curl -X GET http://localhost:5001/forwardingrules/get --data-urlencode 'ip=35.20
 {"IPAddress":"35.200.132.201","IPProtocol":"TCP","name":"raghulc-1","portRange":"1-65535","target":"raghulc-1"}
 ```
 
+```bash
+curl -X GET http://localhost:8080/dns
+```
+```json
+[{"ip":["2.2.2.2"],"name":"abc.thisistemp.com.","ttl":300,"type":"A"},{"ip":["1.1.1.1"],"name":"xyz.thisistest.com.","ttl":30,"type":"A"}]
+```
+
+```bash
+curl -X GET http://localhost:8080/dns/xyz.thisistest.com
+```
+```json
+{"ip":["1.1.1.1"],"name":"xyz.thisistest.com.","ttl":30,"type":"A"}
+```
+
+```bash
+curl -X POST -H "Content-Type: application/json" http://localhost:8080/dns -d '{"ip": "3.3.3.3", "hostname": "abc.thisisdummy.net"}'
+```
+```json
+{"additions":[{"kind":"dns#resourceRecordSet","name":"abc.thisisdummy.net.","rrdatas":["3.3.3.3"],"signatureRrdatas":[],"ttl":30,"type":"A"}],"deletions":[],"id":"1","kind":"dns#change","startTime":"2020-05-16T20:42:28.947Z","status":"pending"}
+```
+
+```bash
+curl -X DELETE -H "Content-Type: application/json" http://localhost:8080/dns/abc.thisisdummy.net
+```
+```json
+true
+```

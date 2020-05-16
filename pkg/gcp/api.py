@@ -1,5 +1,5 @@
 import sys, os
-
+import tldextract
 from flask import Flask, request, url_for, jsonify
 import os
 from . import features
@@ -158,6 +158,68 @@ def api_delete_forwarding_rule(request):
         fr = features.forwardingrules.delete(name)
         ti = features.targetinstances.delete(name)
         return (jsonify(fr and ti))
+
+
+@app.route("/dns", methods = ['GET', 'POST'])
+def api_records_list_create():
+    if request.method == "GET":
+        a_records = []
+        zones = features.dnszones.get_all_dns_zones()
+        for zone in zones:
+            records = features.dnszones.get_all_dns_records(zone['name'])
+            for record in records:
+                if record['type'] == "A":
+                    a_records.append(record)
+        return (jsonify(a_records))
+    if request.method == "POST":
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify(status=False, msg='Posted data not in json format')
+        if 'ip' not in data or 'hostname' not in data:
+            return jsonify(status=False, msg='Both ip and hostname are required')
+        ip = data['ip']
+        hostname = data['hostname']
+        hostname_details  = tldextract.extract(hostname)
+        domain = str(hostname_details[1] + "." + hostname_details[2])
+        zone = features.dnszones.zone_exists(domain)
+        if not zone:
+            return (jsonify(status=False, msg='DNS Zone does not exits for domain ' + domain))
+        else:
+            record = features.dnszones.record_exists_in_zone(zone['name'], hostname, 'A')
+            if not record:
+                response = features.dnszones.create_dns_records(zone['name'], hostname, ip)
+                return (jsonify(response))
+            else:
+                return (jsonify({'record': record, 'msg': 'DNS Record already exits for hostname ' + hostname}))
+
+@app.route("/dns/<item>", methods = ['GET', 'DELETE'])
+def api_records_get_delete(item):
+    if request.method == "GET":
+        hostname_details  = tldextract.extract(item)
+        domain = str(hostname_details[1] + "." + hostname_details[2])
+        zone = features.dnszones.zone_exists(domain)
+        if not zone:
+            return (jsonify(status=False, msg='DNS Record doesn\'t exist for hostname ' + item))
+        else:
+            record = features.dnszones.record_exists_in_zone(zone['name'], item, "A")
+            if record:
+                return (jsonify(record))
+            else:
+                return (jsonify(status=False, msg='DNS Record doesn\'t exist for hostname ' + item))
+    if request.method == "DELETE":
+        hostname_details  = tldextract.extract(item)
+        domain = str(hostname_details[1] + "." + hostname_details[2])
+        zone = features.dnszones.zone_exists(domain)
+        if not zone:
+            return (jsonify(True))
+        else:
+            record = features.dnszones.record_exists_in_zone(zone['name'], item, "A")
+            if record:
+                features.dnszones.delete_dns_records(zone['name'], item, record['ip'], record['type'], record['ttl'])
+                return (jsonify(True))
+            else:
+                return (jsonify(True))
+
 
 # Flask Exception Handling
 @app.errorhandler(404)

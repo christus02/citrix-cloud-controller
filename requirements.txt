@@ -4,3 +4,4 @@ google-auth-httplib2==0.0.3
 pprint
 oauth2client
 flask
+tldextract
