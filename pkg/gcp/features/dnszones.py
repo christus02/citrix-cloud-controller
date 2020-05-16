@@ -16,17 +16,20 @@ def get_all_dns_zones():
     project = metadata.get('project')
 
     managed_zone_list = []
-    request = service.managedZones().list(project=project)
-    while request is not None:
-        response = request.execute()
+    try:
+        request = service.managedZones().list(project=project)
+        while request is not None:
+            response = request.execute()
 
-        for managed_zone in response['managedZones']:
-            managed_zone_list.append({'name':  managed_zone['name'],
-                                      'dns_name': managed_zone['dnsName']})
+            for managed_zone in response['managedZones']:
+                managed_zone_list.append({'name':  managed_zone['name'],
+                                          'dns_name': managed_zone['dnsName']})
 
-        request = service.managedZones().list_next(previous_request=request, previous_response=response)
+            request = service.managedZones().list_next(previous_request=request, previous_response=response)
 
-    return managed_zone_list
+        return managed_zone_list
+    except:
+        return False
 
 def create_dns_zones(name, dns_name, description=""):
     credentials = GoogleCredentials.get_application_default()
@@ -38,29 +41,33 @@ def create_dns_zones(name, dns_name, description=""):
         "description": description
     }
 
-    request = service.managedZones().create(project=project, body=managed_zone_body)
-    response = request.execute()
-    return response
+    try:
+        response = service.managedZones().create(project=project, body=managed_zone_body).execute()
+        return response
+    except:
+        return False
 
 def delete_dns_zones(name):
     credentials = GoogleCredentials.get_application_default()
     service = discovery.build('dns', 'v1', credentials=credentials)
     project = metadata.get('project')
 
-    request = service.managedZones().delete(project=project, managedZone=name)
-    response = request.execute()
-    return response
+    try:
+        response = service.managedZones().delete(project=project, managedZone=name).execute()
+        return response
+    except:
+        return False
 
 def get_dns_zones_with_name(name):
     credentials = GoogleCredentials.get_application_default()
     service = discovery.build('dns', 'v1', credentials=credentials)
     project = metadata.get('project')
 
-#    try:
-    get_response = service.managedZones().get(project=project, managedZone=name).execute()
-    return ({'name':get_response['name'], 'dns_name':get_response['dnsName'], 'description':get_response['description']})
-#    except:
-#        return False
+    try:
+        response = service.managedZones().get(project=project, managedZone=name).execute()
+        return ({'name':response['name'], 'dns_name':response['dnsName'], 'description':response['description']})
+    except:
+        return False
 
 def get_all_dns_records(zone_name):
     credentials = GoogleCredentials.get_application_default()
@@ -68,19 +75,21 @@ def get_all_dns_records(zone_name):
     project = metadata.get('project')
 
     record_list = []
-    request = service.resourceRecordSets().list(project=project, managedZone=zone_name)
-    while request is not None:
-        response = request.execute()
+    try:
+        request = service.resourceRecordSets().list(project=project, managedZone=zone_name)
+        while request is not None:
+            response = request.execute()
 
-        for resource_record_set in response['rrsets']:
-            record_list.append({'name': resource_record_set['name'],
-				'type': resource_record_set['type'],
-				'ttl': resource_record_set['ttl'],
-				'ip': resource_record_set['rrdatas']})
-        # TODO: Change code below to process each `resource_record_set` resource:
-        request = service.resourceRecordSets().list_next(previous_request=request, previous_response=response)
+            for resource_record_set in response['rrsets']:
+                record_list.append({'name': resource_record_set['name'],
+                                    'type': resource_record_set['type'],
+                                    'ttl': resource_record_set['ttl'],
+                                    'ip': resource_record_set['rrdatas']})
+            request = service.resourceRecordSets().list_next(previous_request=request, previous_response=response)
 
-    return record_list
+        return record_list
+    except:
+        return False
 
 def create_dns_records(zone_name, name, ip, record_type="A", ttl=30):
     credentials = GoogleCredentials.get_application_default()
@@ -88,7 +97,6 @@ def create_dns_records(zone_name, name, ip, record_type="A", ttl=30):
     project = metadata.get('project')
 
     change_body = {
-    # TODO: Add desired entries to the request body.
         "additions": [
         {
           "name": name+".",
@@ -98,10 +106,11 @@ def create_dns_records(zone_name, name, ip, record_type="A", ttl=30):
         }]
     }
 
-    request = service.changes().create(project=project, managedZone=zone_name, body=change_body)
-    response = request.execute()
-
-    return response
+    try:
+        response = service.changes().create(project=project, managedZone=zone_name, body=change_body).execute()
+        return response
+    except:
+        return False
 
 def delete_dns_records(zone_name, name, ip, record_type, ttl):
     credentials = GoogleCredentials.get_application_default()
@@ -119,10 +128,11 @@ def delete_dns_records(zone_name, name, ip, record_type, ttl):
         }]
     }
 
-    request = service.changes().create(project=project, managedZone=zone_name, body=change_body)
-    response = request.execute()
-
-    return response
+    try:
+        response = service.changes().create(project=project, managedZone=zone_name, body=change_body).execute()
+        return response
+    except:
+        return False
 
 def record_exists_in_zone(zone_name, record_name, record_type):
     records = get_all_dns_records(zone_name)
