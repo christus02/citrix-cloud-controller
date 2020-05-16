@@ -11,8 +11,7 @@ import sys
 CREDENTIALS = GoogleCredentials.get_application_default()
 
 def get_all_dns_zones():
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('dns', 'v1', credentials=credentials)
+    service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
     project = metadata.get('project')
 
     managed_zone_list = []
@@ -32,8 +31,7 @@ def get_all_dns_zones():
         return False
 
 def create_dns_zones(name, dns_name, description=""):
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('dns', 'v1', credentials=credentials)
+    service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
     project = metadata.get('project')
     managed_zone_body = {
         "name": name,
@@ -48,8 +46,7 @@ def create_dns_zones(name, dns_name, description=""):
         return False
 
 def delete_dns_zones(name):
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('dns', 'v1', credentials=credentials)
+    service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
     project = metadata.get('project')
 
     try:
@@ -59,8 +56,7 @@ def delete_dns_zones(name):
         return False
 
 def get_dns_zones_with_name(name):
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('dns', 'v1', credentials=credentials)
+    service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
     project = metadata.get('project')
 
     try:
@@ -70,8 +66,7 @@ def get_dns_zones_with_name(name):
         return False
 
 def get_all_dns_records(zone_name):
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('dns', 'v1', credentials=credentials)
+    service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
     project = metadata.get('project')
 
     record_list = []
@@ -92,8 +87,7 @@ def get_all_dns_records(zone_name):
         return False
 
 def create_dns_records(zone_name, name, ip, record_type="A", ttl=30):
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('dns', 'v1', credentials=credentials)
+    service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
     project = metadata.get('project')
 
     change_body = {
