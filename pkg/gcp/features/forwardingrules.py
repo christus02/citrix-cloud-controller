@@ -2,14 +2,14 @@ import requests
 import os
 import time
 from googleapiclient import discovery
-from helper import *
-import metadata
+from . import helper
+from . import metadata
 from oauth2client.client import GoogleCredentials
-
+import sys
 
 CREDENTIALS = GoogleCredentials.get_application_default()
 
-def list():
+def list_forwardingrules():
     service = discovery.build('compute', 'v1', credentials=CREDENTIALS)
     project = metadata.get('project')
     region = metadata.get('region')
@@ -20,7 +20,7 @@ def list():
         for forwarding_rule in response['items']:
             filter_keys = ['name', 'target', 'IPAddress', 'IPProtocol', 'portRange']
             filtered_data = { filter_key: forwarding_rule[filter_key] for filter_key in filter_keys }
-            filtered_data['target'] = response['target'].split('/')[-1]
+            filtered_data['target'] = forwarding_rule['target'].split('/')[-1]
             forwardingrules.append(filtered_data)
         request = service.forwardingRules().list_next(previous_request=request, previous_response=response)
     return forwardingrules
@@ -66,9 +66,12 @@ def delete(name, wait=True):
     service = discovery.build('compute', 'v1', credentials=credentials)
     project = metadata.get('project')
     region = metadata.get('region')
-    request = service.forwardingRules().delete(project=project, region=region, forwardingRule=name)
-    response = request.execute()
+    try:
+        request = service.forwardingRules().delete(project=project, region=region, forwardingRule=name)
+        response = request.execute()
+    except Exception as e:
+        return False
     if wait:
         if response['status'] == 'RUNNING':
             response = helper.wait_for_operation(service, response['name'], project, region=region)
-    return bool(get_with_name(name))
+    return not bool(get_with_name(name))

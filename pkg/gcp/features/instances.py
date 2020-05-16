@@ -5,12 +5,12 @@ from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 
 def get_with_ip(ip):
-	# IP of the VPX which was provided by the User
-	# Assuming this to the be the primary IP
-	instance_list = get_all_instance_ips()
-	for i in instance_list:
-		if ip == i['ip']:
-		    return i['name']
+    # IP of the VPX which was provided by the User
+    # Assuming this to the be the primary IP
+    instance_list = get_all_instance_ips()
+    for i in instance_list:
+        if ip == i['ip']:
+            return i['name']
     return False
 
 def get_all():

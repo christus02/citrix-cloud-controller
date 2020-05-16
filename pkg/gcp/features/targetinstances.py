@@ -3,7 +3,9 @@ import os
 import time
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
-from helper import *
+from . import helper
+from . import metadata
+import sys
 
 def delete(name, wait=True):
     credentials = GoogleCredentials.get_application_default()
@@ -11,7 +13,11 @@ def delete(name, wait=True):
     project = metadata.get('project')
     zone = metadata.get('zone')
     request = service.targetInstances().delete(project=project, zone=zone, targetInstance=name)
-    response = request.execute()
+    try:
+        response = request.execute()
+    except Exception as e:
+        return False
+        
     if wait:
         if response['status'] == 'RUNNING':
             response = helper.wait_for_operation(service, response['name'], project, zone=zone)
@@ -73,3 +79,30 @@ def get_with_name(name):
         return ({'name':get_response['name'], 'instance':get_response['instance'].split('/')[-1]})
     except:
         return False
+
+def get_all_instance_ips():
+    # This function returns all the instance NIC0 IP with its name
+    credentials = GoogleCredentials.get_application_default()
+    service = discovery.build('compute', 'v1', credentials=credentials)
+    project = metadata.get('project')
+    zone = metadata.get('zone')
+    instance_list = []
+    request = service.instances().list(project=project, zone=zone)
+    while request is not None:
+        response = request.execute()
+        for instance in response['items']:
+            instance_list.append({'name':instance['name'], 'ip':instance['networkInterfaces'][0]['networkIP']})
+        request = service.instances().list_next(previous_request=request, previous_response=response)
+    return instance_list
+
+
+def get_instance_name_with_ip(ip):
+    # IP of the VPX which was provided by the User
+    # Assuming this to the be the primary IP
+    instance_list = get_all_instance_ips()
+    for i in instance_list:
+        if ip == i['ip']:
+            return i['name']
+    return False
+
+
