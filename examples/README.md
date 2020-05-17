@@ -17,6 +17,19 @@ The advantage in deploying `Citrix Cloud Controller` as a separate deployment is
 
 ## Create a Citrix Ingress Controller
 
+In order to create Citrix Ingress Controller, provide details of the Citrix ADC VPX in the manifest file.
+
+1. Update the Citrix ADC VPX Management IP in the `NS_IP` field
+2. Create a Kubernetes Secret of Citrix ADC VPX credentials which will be used by Citrix Ingress Controller for configuration
+
+Example Kubernetes Secret command below:
+
+```
+kubectl create secret  generic nslogin --from-literal=username='nsroot' --from-literal=password='nsroot'
+```
+
+After updating the required fields, create the Citrix Ingress Controller
+
 ```
 kubectl create -f citrix-ingress-controller.yaml
 ```
