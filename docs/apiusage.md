@@ -149,7 +149,7 @@ curl -X GET http://localhost:8080/dns
 curl -X GET http://localhost:8080/dns/xyz.thisistest.com
 ```
 ```json
-{"ip":["1.1.1.1"],"name":"xyz.thisistest.com.","ttl":30,"type":"A"}
+{"record":{"ip":["1.1.1.1"],"name":"xyz.thisistest.com.","ttl":30,"type":"A"}}
 ```
 
 ```bash
