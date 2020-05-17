@@ -19,7 +19,7 @@ Citrix Cloud Controller has an in-built API server running which would respond t
 | `/vip` | GET | None |  JSON of all configured VIP <br> To retrieve all configured VIPs | None |
 | `/vip/vip-name` | GET | None |  JSON of the a specific vip `vip-name` <br> To retrieve a VIP usings it NAME | None |
 | `/vip/vip-ip` | GET | None |  JSON of the a specific vip `vip-ip` <br> To retrieve a VIP using its IP | None |
-| `/vip` | POST | `{'name':'ingress-name', 'nsip':'NS_IP'}` |  JSON of the created VIP | None |
+| `/vip` | POST | `{'name':'ingress-name', 'ip':'NS_IP'}` |  JSON of the created VIP | None |
 | `/vip/vip-name` | DELETE | None | JSON returning the status of the delete operation <br> Delete VIP using Name | None |
 | `/vip/vip-ip` | DELETE | None | JSON returning the status of the deletion operation <br> Delete VIP using IP | None |
 
@@ -28,8 +28,8 @@ Citrix Cloud Controller has an in-built API server running which would respond t
 | API ENDPOINT | METHOD | REQUEST JSON BODY | RESPONSE | COMMENTS |
 | --- | --- | --- | --- | --- |
 | `/dns` | GET | None | JSON of all configured DNS records <br> To retrieve all configured DNS | None |
-| `/dns/dns-name` | GET | None | JSON of the specified DNS name (ingress-name) <br> To retrieve a DNS record using its name | None |
-| `/dns` | POST | `{}` | JSON of the created DNS record | None |
+| `/dns/dns-name` | GET | None | JSON of the specified DNS name (host-name) <br> To retrieve its corresponding DNS record  | None |
+| `/dns` | POST | `{'ip': 'vip-ip','hostname': 'host_name'}` | JSON of the created DNS record | None |
 | `/dns/dns-name` | DELETE | None | JSON returning the status of the deletion operation | None |
 
 
