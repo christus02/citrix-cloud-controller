@@ -19,7 +19,7 @@ rules:
     verbs: ["create"]
   - apiGroups: ["extensions"]
     resources: ["ingresses", "ingresses/status"]
-    verbs: ["get", "list", "watch"]
+    verbs: ["get", "list", "watch", "patch"]
   - apiGroups: ["apiextensions.k8s.io"]
     resources: ["customresourcedefinitions"]
     verbs: ["get", "list", "watch"]
@@ -82,7 +82,8 @@ spec:
       serviceAccountName: cic-k8s-role
       containers:
       - name: cic-k8s-ingress-controller
-        image: "asia.gcr.io/kops-automation/citrix-ingress-controller:v4"
+        #image: "asia.gcr.io/kops-automation/citrix-ingress-controller:v4"
+        image: "asia.gcr.io/kops-automation/citrix-ingress-controller:v6"
         env:
          # Set NetScaler NSIP/SNIP, SNIP in case of HA (mgmt has to be enabled) 
          - name: "NS_IP"
