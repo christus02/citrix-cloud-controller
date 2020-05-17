@@ -153,7 +153,7 @@ def record_exists_in_zone(zone_name, record_name, record_type):
     records = get_all_dns_records(zone_name)
     for record in records:
         if record['name'] == record_name+'.' and record['type'] == record_type:
-            return record
+            return ({'record': record})
     return None
 
 def zone_exists(dns_name):
