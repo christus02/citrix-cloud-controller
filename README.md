@@ -1,3 +1,5 @@
+![Build](https://github.com/christus02/citrix-cloud-controller/workflows/Build/badge.svg)
+
 # Citrix Cloud Controller
 
 Citrix Cloud Controller provides complete end-to-end deployment solutions for Ingresses deployed on Kubernetes Clusters in cloud environments.
