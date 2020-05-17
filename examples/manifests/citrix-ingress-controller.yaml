@@ -82,11 +82,11 @@ spec:
       serviceAccountName: cic-k8s-role
       containers:
       - name: cic-k8s-ingress-controller
-        image: "quay.io/citrix/citrix-k8s-ingress-controller:1.7.6"
+        image: "asia.gcr.io/kops-automation/citrix-ingress-controller:v4"
         env:
          # Set NetScaler NSIP/SNIP, SNIP in case of HA (mgmt has to be enabled) 
          - name: "NS_IP"
-           value: "x.x.x.x"
+           value: "10.160.0.5"
          # Set username for Nitro
          - name: "NS_USER"
            valueFrom:
@@ -102,6 +102,9 @@ spec:
          # Set log level
          - name: "EULA"
            value: "yes"
+         # Name of Citrix Cloud Controller Service
+         - name: "CITRIX_CLOUD_CONTROLLER_SERVICE"
+           value: "citrix-cloud-controller"
         args:
           - --ingress-classes
             citrix-ingress
