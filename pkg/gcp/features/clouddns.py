@@ -102,13 +102,16 @@ def create_dns_records(zone_name, name, ip, record_type="A", ttl=30):
 
     try:
         response = service.changes().create(project=project, managedZone=zone_name, body=change_body).execute()
-        return response
+        response = confim_dns_record_creation(zone_name, response['id'])
+        if response:
+            return response
+        else:
+            return ({'status': False, 'msg': 'It\'s taking too long to create DNS Record. It might not get created'})
     except:
         return False
 
 def delete_dns_records(zone_name, name, ip, record_type, ttl):
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('dns', 'v1', credentials=credentials)
+    service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
     project = metadata.get('project')
 
     change_body = {
@@ -125,6 +128,20 @@ def delete_dns_records(zone_name, name, ip, record_type, ttl):
     try:
         response = service.changes().create(project=project, managedZone=zone_name, body=change_body).execute()
         return response
+    except:
+        return False
+
+def confim_dns_record_creation(zone_name, change_id):
+    service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
+    project = metadata.get('project')
+
+    try:
+        for count in range(0, 30, 1):
+            response = service.changes().get(project=project, managedZone=zone_name, changeId=change_id).execute()
+            if response['status'].lower() == 'done':
+                return response
+            time.sleep(2)
+        return False
     except:
         return False
 

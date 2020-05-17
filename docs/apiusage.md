@@ -156,7 +156,7 @@ curl -X GET http://localhost:8080/dns/xyz.thisistest.com
 curl -X POST -H "Content-Type: application/json" http://localhost:8080/dns -d '{"ip": "3.3.3.3", "hostname": "abc.thisisdummy.net"}'
 ```
 ```json
-{"additions":[{"kind":"dns#resourceRecordSet","name":"abc.thisisdummy.net.","rrdatas":["3.3.3.3"],"signatureRrdatas":[],"ttl":30,"type":"A"}],"deletions":[],"id":"1","kind":"dns#change","startTime":"2020-05-16T20:42:28.947Z","status":"pending"}
+{"additions":[{"kind":"dns#resourceRecordSet","name":"abcde.thisistest.com.","rrdatas":["3.3.3.3"],"signatureRrdatas":[],"ttl":30,"type":"A"}],"deletions":[],"id":"29","kind":"dns#change","startTime":"2020-05-17T10:03:50.155Z","status":"done"}
 ```
 
 ```bash
