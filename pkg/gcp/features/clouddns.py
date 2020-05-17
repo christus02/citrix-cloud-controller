@@ -77,9 +77,9 @@ def get_all_dns_records(zone_name):
 
             for resource_record_set in response['rrsets']:
                 record_list.append({'name': resource_record_set['name'],
+                                    'ip': resource_record_set['rrdatas'],
                                     'type': resource_record_set['type'],
-                                    'ttl': resource_record_set['ttl'],
-                                    'ip': resource_record_set['rrdatas']})
+                                    'ttl': resource_record_set['ttl']})
             request = service.resourceRecordSets().list_next(previous_request=request, previous_response=response)
 
         return record_list
@@ -104,7 +104,11 @@ def create_dns_records(zone_name, name, ip, record_type="A", ttl=30):
         response = service.changes().create(project=project, managedZone=zone_name, body=change_body).execute()
         response = confim_dns_record_creation(zone_name, response['id'])
         if response:
-            return response
+            for add_instance in response['additions']:
+                if add_instance['name'] == name + ".":
+                    return({'record': {'name': add_instance['name'], 'ip': add_instance['rrdatas'], 'type': add_instance['type'],
+                            'ttl': add_instance['ttl']}, 'status': response['status']})
+            return ({'status': False, 'msg': 'It\'s taking too long to create DNS Record. It might not get created'})
         else:
             return ({'status': False, 'msg': 'It\'s taking too long to create DNS Record. It might not get created'})
     except:
@@ -149,7 +153,7 @@ def record_exists_in_zone(zone_name, record_name, record_type):
     records = get_all_dns_records(zone_name)
     for record in records:
         if record['name'] == record_name+'.' and record['type'] == record_type:
-            return record
+            return ({'record': record})
     return None
 
 def zone_exists(dns_name):

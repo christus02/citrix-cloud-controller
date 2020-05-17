@@ -190,7 +190,7 @@ def api_records_list_create():
                 response = features.clouddns.create_dns_records(zone['name'], hostname, ip)
                 return (jsonify(response))
             else:
-                return (jsonify({'record': record, 'msg': 'DNS Record already exits for hostname ' + hostname}))
+                return (jsonify({'record': record['record'], 'msg': 'DNS Record already exits for hostname ' + hostname}))
 
 @app.route("/dns/<item>", methods = ['GET', 'DELETE'])
 def api_records_get_delete(item):
@@ -215,7 +215,7 @@ def api_records_get_delete(item):
         else:
             record = features.clouddns.record_exists_in_zone(zone['name'], item, "A")
             if record:
-                features.clouddns.delete_dns_records(zone['name'], item, record['ip'], record['type'], record['ttl'])
+                features.clouddns.delete_dns_records(zone['name'], item, record['record']['ip'], record['record']['type'], record['record']['ttl'])
                 return (jsonify(True))
             else:
                 return (jsonify(True))
