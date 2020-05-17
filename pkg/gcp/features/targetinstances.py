@@ -86,12 +86,16 @@ def get_all_instance_ips():
     service = discovery.build('compute', 'v1', credentials=credentials)
     project = metadata.get('project')
     zone = metadata.get('zone')
+    network = metadata.get('network')
     instance_list = []
     request = service.instances().list(project=project, zone=zone)
     while request is not None:
         response = request.execute()
         for instance in response['items']:
-            instance_list.append({'name':instance['name'], 'ip':instance['networkInterfaces'][0]['networkIP']})
+            network_nic0 = instance['networkInterfaces'][0]['network'].split('/')[-1]
+            # Append only the instances in the same network
+            if network_nic0 == network:
+                instance_list.append({'name':instance['name'], 'ip':instance['networkInterfaces'][0]['networkIP']})
         request = service.instances().list_next(previous_request=request, previous_response=response)
     return instance_list
 
