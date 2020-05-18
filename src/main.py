@@ -6,13 +6,17 @@ import requests # noqa
 from pkg.gcp import api as gcp_api # noqa
 from pkg.aws import api as aws_api # noqa
 from pkg.azure import api as azure_api # noqa
+from pkg import api as no_api # noqa
 
 
 def get_cloud():
     # Returns what cloud you are running in
     # Possible returns = "gcp", "aws", "azure"
     METADATA_SERVER_ENDPOINT = "http://169.254.169.254"
-    response = requests.get(METADATA_SERVER_ENDPOINT)
+    try:
+        response = requests.get(METADATA_SERVER_ENDPOINT, timeout=5)
+    except Exception:
+        return ""
     server_header = response.headers['Server']
     if server_header == "Metadata Server for VM":
         return "gcp"
@@ -33,3 +37,4 @@ if CLOUD.lower() in api_dict:
     api_dict[CLOUD.lower()].run_server()
 else:
     print(CLOUD + "Not supported. Coming soon...")
+    no_api.run_server()
