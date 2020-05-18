@@ -3,7 +3,12 @@ from googleapiclient import discovery
 from . import metadata
 from oauth2client.client import GoogleCredentials
 
-CREDENTIALS = GoogleCredentials.get_application_default()
+CREDENTIALS = ""
+
+
+def set_up_creds():
+    global CREDENTIALS
+    CREDENTIALS = GoogleCredentials.get_application_default()
 
 
 def get_all_dns_zones():

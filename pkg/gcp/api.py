@@ -251,4 +251,5 @@ def internal_server_error(e):
 
 
 def run_server():
+    features.helper.set_up()
     app.run(host='0.0.0.0', port=FLASK_PORT)
