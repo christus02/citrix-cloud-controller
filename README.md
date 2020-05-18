@@ -25,6 +25,9 @@ To complete the flow, Citrix Cloud Controller can also update the DNS for the In
 
 For example, if the host rule in the Ingress is `apache.cloud-controller.ga`, Citrix Cloud Controller automatically creates a `A record` with the Public IP address allocated from the Cloud provider and updates the DNS of the Cloud (`Cloud DNS`, `Route 53`, etc)
 
+# See Citrix Cloud Controller in Action
+
+[![asciicast](https://asciinema.org/a/331371.svg)](https://asciinema.org/a/331371)
 
 # How to Deploy
 
