@@ -29,6 +29,9 @@ jobs:
       run: |
         python src/main.py &
         
+    - name: Wait for the Server to be ready
+      run: sleep 10
+        
     - name: Curl Check
       run: |
         curl http://localhost:8080/healthz
