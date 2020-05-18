@@ -28,4 +28,8 @@ jobs:
     - name: Start Server
       run: |
         nohup python src/main.py &
+    - name: Curl Check
+      run: |
+        sleep 10
+        curl http://localhost:8080/healthz
 
