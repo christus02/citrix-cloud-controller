@@ -1,11 +1,12 @@
-import sys, os
-import requests
+import sys
+import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'pkg'))
+import requests # noqa
+from pkg.gcp import api as gcp_api # noqa
+from pkg.aws import api as aws_api # noqa
+from pkg.azure import api as azure_api # noqa
 
-from pkg.gcp import api as gcp_api
-from pkg.aws import api as aws_api
-from pkg.azure import api as azure_api
 
 def get_cloud():
     # Returns what cloud you are running in
@@ -21,6 +22,7 @@ def get_cloud():
         return "azure"
     else:
         return ""
+
 
 # Define what cloud you are running in
 CLOUD = get_cloud()

@@ -1,5 +1,6 @@
 import time
-from googleapiclient import discovery
+from googleapiclient import discovery # noqa
+
 
 def wait_for_operation(service, operation, project, zone=None, region=None):
     while True:

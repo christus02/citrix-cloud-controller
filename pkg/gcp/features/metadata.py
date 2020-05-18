@@ -7,6 +7,7 @@ ZONE_ENDPOINT = METADATA_ENDPOINT + '/computeMetadata/v1/instance/zone'
 PROJECT_ENDPOINT = METADATA_ENDPOINT + '/computeMetadata/v1/project/project-id'
 NETWORK_ENDPOINT = METADATA_ENDPOINT + '/computeMetadata/v1/instance/network-interfaces/0/network'
 
+
 def get(entity):
     if entity == "project":
         endpoint = PROJECT_ENDPOINT
@@ -16,7 +17,8 @@ def get(entity):
         endpoint = ZONE_ENDPOINT
         response = requests.get(endpoint, headers=HEADERS)
         if entity == "zone":
-            zone = response.text.split('/')[-1] # The last index is the zone - Example: projects/565214722813/zones/asia-south1-a
+            # The last index is the zone - Example: projects/565214722813/zones/asia-south1-a
+            zone = response.text.split('/')[-1]
             return (zone)
         elif entity == "region":
             region = response.text.split('/')[-1][:-2]
@@ -27,5 +29,4 @@ def get(entity):
         endpoint = NETWORK_ENDPOINT
         response = requests.get(endpoint, headers=HEADERS)
         network = response.text.split('/')[-1]
-        return (network)
-        
+        return network
