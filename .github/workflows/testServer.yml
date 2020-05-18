@@ -25,9 +25,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Start Server and Check if its running
+    - name: Start Server
       run: |
         nohup python src/main.py &
-        sleep 10
-        curl -v http://localhost:8080/healthz
 
