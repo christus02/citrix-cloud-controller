@@ -1,11 +1,8 @@
-import requests
-import os
-import time
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 from . import helper
 from . import metadata
-import sys
+
 
 def delete(name, wait=True):
     credentials = GoogleCredentials.get_application_default()
@@ -15,9 +12,8 @@ def delete(name, wait=True):
     request = service.targetInstances().delete(project=project, zone=zone, targetInstance=name)
     try:
         response = request.execute()
-    except Exception as e:
+    except Exception:
         return False
-        
     if wait:
         if response['status'] == 'RUNNING':
             response = helper.wait_for_operation(service, response['name'], project, zone=zone)
@@ -25,6 +21,7 @@ def delete(name, wait=True):
         return False
     else:
         return True
+
 
 def create(name, instance_ip=None, instance_name=None, natPolicy="NO_NAT", wait=True):
     # Name can be 63 Characters long and can contain [a-z]([-a-z0-9]*[a-z0-9])?
@@ -44,17 +41,18 @@ def create(name, instance_ip=None, instance_name=None, natPolicy="NO_NAT", wait=
     # Create new target instance if not already existing
     instance_name = "zones/"+zone+"/instances/"+instance_name
     target_instance_body = {
-            "name": name, 
+            "name": name,
             "natPolicy": natPolicy,
             "instance": instance_name,
     }
     request = service.targetInstances().insert(project=project, zone=zone, body=target_instance_body)
     response = request.execute()
-    if wait: 
+    if wait:
         if response['status'] == 'RUNNING':
             response = helper.wait_for_operation(service, response['name'], project, zone=zone)
     return (get_with_name(name))
-    
+
+
 def get_all():
     credentials = GoogleCredentials.get_application_default()
     service = discovery.build('compute', 'v1', credentials=credentials)
@@ -65,9 +63,13 @@ def get_all():
     while request is not None:
         response = request.execute()
         for target_instance in response['items']:
-            target_instance_list.append({'name':target_instance['name'], 'instance':target_instance['instance'].split('/')[-1]})
+            target_instance_list.append(
+                                 {'name': target_instance['name'],
+                                  'instance': target_instance['instance'].split('/')[-1]}
+                                 )
         request = service.targetInstances().list_next(previous_request=request, previous_response=response)
     return target_instance_list
+
 
 def get_with_name(name):
     credentials = GoogleCredentials.get_application_default()
@@ -76,9 +78,10 @@ def get_with_name(name):
     zone = metadata.get('zone')
     try:
         get_response = service.targetInstances().get(project=project, zone=zone, targetInstance=name).execute()
-        return ({'name':get_response['name'], 'instance':get_response['instance'].split('/')[-1]})
-    except:
+        return ({'name': get_response['name'], 'instance': get_response['instance'].split('/')[-1]})
+    except Exception:
         return False
+
 
 def get_all_instance_ips():
     # This function returns all the instance NIC0 IP with its name
@@ -95,7 +98,7 @@ def get_all_instance_ips():
             network_nic0 = instance['networkInterfaces'][0]['network'].split('/')[-1]
             # Append only the instances in the same network
             if network_nic0 == network:
-                instance_list.append({'name':instance['name'], 'ip':instance['networkInterfaces'][0]['networkIP']})
+                instance_list.append({'name': instance['name'], 'ip': instance['networkInterfaces'][0]['networkIP']})
         request = service.instances().list_next(previous_request=request, previous_response=response)
     return instance_list
 
@@ -108,5 +111,3 @@ def get_instance_name_with_ip(ip):
         if ip == i['ip']:
             return i['name']
     return False
-
-

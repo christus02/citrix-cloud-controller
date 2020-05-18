@@ -1,7 +1,6 @@
-import sys, os
-import tldextract
-from flask import Flask, request, url_for, jsonify
 import os
+import tldextract
+from flask import Flask, request, jsonify
 from . import features
 import re
 
@@ -10,74 +9,83 @@ regex = '''^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(
             25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
             25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)'''
 
+
 def is_IP(IP):
     if(re.search(regex, IP)):
         return True
     else:
         return False
 
+
 def get_vip_from_fr_ti(fr, ti):
     data = {
-            "externalIP":fr["IPAddress"],
-            "internalIP":fr["IPAddress"],
-            "protocol":fr["IPProtocol"],
-            "ingressName":fr["name"],
-            "portRange":fr["portRange"],
-            "instanceName":""
+            "externalIP": fr["IPAddress"],
+            "internalIP": fr["IPAddress"],
+            "protocol": fr["IPProtocol"],
+            "ingressName": fr["name"],
+            "portRange": fr["portRange"],
+            "instanceName": ""
             }
     if ti:
         data['instanceName'] = ti["instance"]
     return data
 
+
 app = Flask(__name__)
 FLASK_PORT = int(os.environ.get('FLASK_PORT', 8080))
 
-@app.route("/healthz", methods = ['GET'])
+
+@app.route("/healthz", methods=['GET'])
 def health():
-    return jsonify({"status":True, "success":True, "msg":"I am Alive!", "cloud":"gcp"})
+    return jsonify({"status": True, "success": True, "msg": "I am Alive!", "cloud": "gcp"})
+
 
 # METADATA
-@app.route("/metadata/project", methods = ['GET'])
+@app.route("/metadata/project", methods=['GET'])
 def metadata_project():
-	return jsonify(project=features.metadata.get('project'))
+    return jsonify(project=features.metadata.get('project'))
 
-@app.route("/metadata/zone", methods = ['GET'])
+
+@app.route("/metadata/zone", methods=['GET'])
 def metadata_zone():
-	return jsonify(zone=features.metadata.get('zone'))
+    return jsonify(zone=features.metadata.get('zone'))
 
-@app.route("/metadata/region", methods = ['GET'])
+
+@app.route("/metadata/region", methods=['GET'])
 def metadata_region():
-	return jsonify(region=features.metadata.get('region'))
+    return jsonify(region=features.metadata.get('region'))
+
 
 # FORWARDING RULES
 # TODO: Change this to a get call.
 # Sample URL: http://IP/forwardingrules/get?{ip/name}=<something>
 @app.route("/forwardingrules/get")
 def fowardingrules_get(request):
-	if 'ip' in request.args:
-		fr = features.forwardingrules.get_with_ip(request.args['ip'])
-	elif 'name' in request.args:
-		fr = features.forwardingrules.get_with_name(request.args['name'])
-	elif not bool(request.args):
-		fr = features.forwardingrules.list_forwardingrules()
+    if 'ip' in request.args:
+        fr = features.forwardingrules.get_with_ip(request.args['ip'])
+    elif 'name' in request.args:
+        fr = features.forwardingrules.get_with_name(request.args['name'])
+    elif not bool(request.args):
+        fr = features.forwardingrules.list_forwardingrules()
+    return jsonify(fr)
 
-	return jsonify(fr)
 
 # TODO: Make this do the part of creating target instances
 # Sample URL: http://IP/forwardingrules/create?ip=<ip>&name=<name>
-@app.route("/forwardingrules", methods = ['GET', 'POST', 'DELETE'])
+@app.route("/forwardingrules", methods=['GET', 'POST', 'DELETE'])
 def api_forwarding_rules():
-        if request.method == "GET":
-            return(fowardingrules_get(request))
-        elif request.method == "POST":
-            return(api_create_forwarding_rule(request))
-        elif request.method == "DELETE":
-            return(api_delete_forwarding_rule(request))
-        else:
-            return jsonify(status=False, msg="Unsupported Request Method")
+    if request.method == "GET":
+        return(fowardingrules_get(request))
+    elif request.method == "POST":
+        return(api_create_forwarding_rule(request))
+    elif request.method == "DELETE":
+        return(api_delete_forwarding_rule(request))
+    else:
+        return jsonify(status=False, msg="Unsupported Request Method")
+
 
 # Sample URL: http://IP/forwardingrules/create?ip=<ip>&name=<name>
-@app.route("/vip", methods = ['GET', 'POST'])
+@app.route("/vip", methods=['GET', 'POST'])
 def api_for_vips():
     if request.method == "GET":
         frl = features.forwardingrules.list_forwardingrules()
@@ -109,8 +117,9 @@ def api_for_vips():
     else:
         return jsonify(status=False, msg="Unsupported Request Method")
 
+
 # Sample URL: http://IP/forwardingrules/create?ip=<ip>&name=<name>
-@app.route("/vip/<item>", methods = ['GET', 'DELETE'])
+@app.route("/vip/<item>", methods=['GET', 'DELETE'])
 def api_for_one_vip(item):
     if request.method == "GET":
         if is_IP(item):
@@ -134,33 +143,35 @@ def api_for_one_vip(item):
     else:
         return jsonify(status=False, msg="Unsupported Request Method")
 
+
 @app.route("/forwardingrules/create")
 def api_create_forwarding_rule(request):
-	if 'ip' not in request.args or 'name' not in request.args:
-		return jsonify(False)
-	ip = request.args['ip']
-	name = request.args['name']
-	created_items = {}
-	created_items['target_instance'] = features.targetinstances.create(name, instance_ip=ip)
-	if created_items['target_instance']:
-		created_items['forwarding_rule'] = features.forwardingrules.create(name, created_items['target_instance']['name'])
-	else:
-		return jsonify(False)
-	return (jsonify(created_items))
+    if 'ip' not in request.args or 'name' not in request.args:
+        return jsonify(False)
+    ip = request.args['ip']
+    name = request.args['name']
+    created_items = {}
+    created_items['target_instance'] = features.targetinstances.create(name, instance_ip=ip)
+    if created_items['target_instance']:
+        created_items['forwarding_rule'] = features.forwardingrules.create(name, created_items['target_instance']['name'])
+    else:
+        return jsonify(False)
+    return (jsonify(created_items))
+
 
 # TODO: Make this do the part of deleting target instances
 @app.route("/forwardingrules/delete")
 def api_delete_forwarding_rule(request):
-        if 'name' not in request.args:
-            return jsonify(False)
-        name = request.args['name']
-        fr = True
-        fr = features.forwardingrules.delete(name)
-        ti = features.targetinstances.delete(name)
-        return (jsonify(fr and ti))
+    if 'name' not in request.args:
+        return jsonify(False)
+    name = request.args['name']
+    fr = True
+    fr = features.forwardingrules.delete(name)
+    ti = features.targetinstances.delete(name)
+    return (jsonify(fr and ti))
 
 
-@app.route("/dns", methods = ['GET', 'POST'])
+@app.route("/dns", methods=['GET', 'POST'])
 def api_records_list_create():
     if request.method == "GET":
         a_records = []
@@ -179,7 +190,7 @@ def api_records_list_create():
             return jsonify(status=False, msg='Both ip and hostname are required')
         ip = data['ip']
         hostname = data['hostname']
-        hostname_details  = tldextract.extract(hostname)
+        hostname_details = tldextract.extract(hostname)
         domain = str(hostname_details[1] + "." + hostname_details[2])
         zone = features.clouddns.zone_exists(domain)
         if not zone:
@@ -192,10 +203,11 @@ def api_records_list_create():
             else:
                 return (jsonify({'record': record['record'], 'msg': 'DNS Record already exits for hostname ' + hostname}))
 
-@app.route("/dns/<item>", methods = ['GET', 'DELETE'])
+
+@app.route("/dns/<item>", methods=['GET', 'DELETE'])
 def api_records_get_delete(item):
     if request.method == "GET":
-        hostname_details  = tldextract.extract(item)
+        hostname_details = tldextract.extract(item)
         domain = str(hostname_details[1] + "." + hostname_details[2])
         zone = features.clouddns.zone_exists(domain)
         if not zone:
@@ -207,7 +219,7 @@ def api_records_get_delete(item):
             else:
                 return (jsonify(status=False, msg='DNS Record doesn\'t exist for hostname ' + item))
     if request.method == "DELETE":
-        hostname_details  = tldextract.extract(item)
+        hostname_details = tldextract.extract(item)
         domain = str(hostname_details[1] + "." + hostname_details[2])
         zone = features.clouddns.zone_exists(domain)
         if not zone:
@@ -215,7 +227,13 @@ def api_records_get_delete(item):
         else:
             record = features.clouddns.record_exists_in_zone(zone['name'], item, "A")
             if record:
-                features.clouddns.delete_dns_records(zone['name'], item, record['record']['ip'], record['record']['type'], record['record']['ttl'])
+                features.clouddns.delete_dns_records(
+                         zone['name'],
+                         item,
+                         record['record']['ip'],
+                         record['record']['type'],
+                         record['record']['ttl']
+                 )
                 return (jsonify(True))
             else:
                 return (jsonify(True))
@@ -225,9 +243,12 @@ def api_records_get_delete(item):
 @app.errorhandler(404)
 def page_not_found(e):
     return jsonify(status=False, error=404, text=str(e)), 404
+
+
 @app.errorhandler(500)
 def internal_server_error(e):
     return jsonify(status=False, error=500, text=str(e)), 500
 
+
 def run_server():
-	app.run(host='0.0.0.0', port=FLASK_PORT)
+    app.run(host='0.0.0.0', port=FLASK_PORT)

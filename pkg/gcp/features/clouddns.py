@@ -1,14 +1,10 @@
-import requests
-import os
 import time
 from googleapiclient import discovery
-from urllib.parse import urlparse
-from . import helper
 from . import metadata
 from oauth2client.client import GoogleCredentials
-import sys
 
 CREDENTIALS = GoogleCredentials.get_application_default()
+
 
 def get_all_dns_zones():
     service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
@@ -27,8 +23,9 @@ def get_all_dns_zones():
             request = service.managedZones().list_next(previous_request=request, previous_response=response)
 
         return managed_zone_list
-    except:
+    except Exception:
         return False
+
 
 def create_dns_zones(name, dns_name, description=""):
     service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
@@ -42,8 +39,9 @@ def create_dns_zones(name, dns_name, description=""):
     try:
         response = service.managedZones().create(project=project, body=managed_zone_body).execute()
         return response
-    except:
+    except Exception:
         return False
+
 
 def delete_dns_zones(name):
     service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
@@ -52,8 +50,9 @@ def delete_dns_zones(name):
     try:
         response = service.managedZones().delete(project=project, managedZone=name).execute()
         return response
-    except:
+    except Exception:
         return False
+
 
 def get_dns_zones_with_name(name):
     service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
@@ -61,9 +60,10 @@ def get_dns_zones_with_name(name):
 
     try:
         response = service.managedZones().get(project=project, managedZone=name).execute()
-        return ({'name':response['name'], 'dns_name':response['dnsName'], 'description':response['description']})
-    except:
+        return ({'name': response['name'], 'dns_name': response['dnsName'], 'description': response['description']})
+    except Exception:
         return False
+
 
 def get_all_dns_records(zone_name):
     service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
@@ -83,20 +83,20 @@ def get_all_dns_records(zone_name):
             request = service.resourceRecordSets().list_next(previous_request=request, previous_response=response)
 
         return record_list
-    except:
+    except Exception:
         return False
+
 
 def create_dns_records(zone_name, name, ip, record_type="A", ttl=30):
     service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
     project = metadata.get('project')
 
     change_body = {
-        "additions": [
-        {
-          "name": name+".",
-          "type": record_type,
-          "ttl": ttl,
-          "rrdatas": [ip]
+        "additions": [{
+            "name": name+".",
+            "type": record_type,
+            "ttl": ttl,
+            "rrdatas": [ip]
         }]
     }
 
@@ -106,22 +106,27 @@ def create_dns_records(zone_name, name, ip, record_type="A", ttl=30):
         if response:
             for add_instance in response['additions']:
                 if add_instance['name'] == name + ".":
-                    return({'record': {'name': add_instance['name'], 'ip': add_instance['rrdatas'], 'type': add_instance['type'],
-                            'ttl': add_instance['ttl']}, 'status': response['status']})
+                    return({
+                            'record': {'name': add_instance['name'],
+                                       'ip': add_instance['rrdatas'],
+                                       'type': add_instance['type'],
+                                       'ttl': add_instance['ttl']},
+                            'status': response['status']
+                          })
             return ({'status': False, 'msg': 'It\'s taking too long to create DNS Record. It might not get created'})
         else:
             return ({'status': False, 'msg': 'It\'s taking too long to create DNS Record. It might not get created'})
-    except:
+    except Exception:
         return False
+
 
 def delete_dns_records(zone_name, name, ip, record_type, ttl):
     service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
     project = metadata.get('project')
 
-    change_body = {
     # TODO: Add desired entries to the request body.
-        "deletions": [
-        {
+    change_body = {
+        "deletions": [{
           "name": name+".",
           "type": record_type,
           "ttl": ttl,
@@ -132,8 +137,9 @@ def delete_dns_records(zone_name, name, ip, record_type, ttl):
     try:
         response = service.changes().create(project=project, managedZone=zone_name, body=change_body).execute()
         return response
-    except:
+    except Exception:
         return False
+
 
 def confim_dns_record_creation(zone_name, change_id):
     service = discovery.build('dns', 'v1', credentials=CREDENTIALS)
@@ -146,8 +152,9 @@ def confim_dns_record_creation(zone_name, change_id):
                 return response
             time.sleep(2)
         return False
-    except:
+    except Exception:
         return False
+
 
 def record_exists_in_zone(zone_name, record_name, record_type):
     records = get_all_dns_records(zone_name)
@@ -155,6 +162,7 @@ def record_exists_in_zone(zone_name, record_name, record_type):
         if record['name'] == record_name+'.' and record['type'] == record_type:
             return ({'record': record})
     return None
+
 
 def zone_exists(dns_name):
     zones = get_all_dns_zones()
