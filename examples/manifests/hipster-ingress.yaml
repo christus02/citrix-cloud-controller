@@ -1,0 +1,19 @@
+#Specify the ingress resource
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: citrix-ingress-hipster
+  annotations:
+   kubernetes.io/ingress.class: "citrix-ingress"
+   ingress.citrix.com/update-cloud-dns: "true"
+
+spec:
+  rules:
+  - host: hipster.cloud-controller.ga
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: frontend-external
+          servicePort: 80
+---

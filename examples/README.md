@@ -47,5 +47,5 @@ kubectl create -f apache.yaml
 Finally, let's create an Ingress definition and see the magic
 
 ```
-kubectl create -f ingress.yaml
+kubectl create -f apache-ingress.yaml
 ```
