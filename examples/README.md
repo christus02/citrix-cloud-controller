@@ -21,6 +21,7 @@ In order to create Citrix Ingress Controller, provide details of the Citrix ADC 
 
 1. Update the Citrix ADC VPX Management IP in the `NS_IP` field
 2. Create a Kubernetes Secret of Citrix ADC VPX credentials which will be used by Citrix Ingress Controller for configuration
+3. Update the Citrix Ingress Controller image. The Image details can be obtained from [Citrix Ingress Controller](https://github.com/citrix/citrix-k8s-ingress-controller/tree/master/deployment) Repository.
 
 Example Kubernetes Secret command below:
 
