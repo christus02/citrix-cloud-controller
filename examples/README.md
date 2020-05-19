@@ -28,6 +28,15 @@ Example Kubernetes Secret command below:
 ```
 kubectl create secret  generic nslogin --from-literal=username='<vpx_username>' --from-literal=password='<vpx_password>'
 ```
+Provide the following enviroment variable in Citrix Ingress Controller:
+
+```
+        - name: "CITRIX_CLOUD_CONTROLLER_SERVICE"
+          value: "<>"
+
+```
+
+The value of the env variable is the k8s service name of Citrix Cloud Controller deployment. Incase Citrix Cloud Controller is deployed as a sidecar the value needs to be set to ```"sidecar"```
 
 After updating the required fields, create the Citrix Ingress Controller
 
