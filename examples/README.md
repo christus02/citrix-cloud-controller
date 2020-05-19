@@ -25,7 +25,7 @@ In order to create Citrix Ingress Controller, provide details of the Citrix ADC 
 Example Kubernetes Secret command below:
 
 ```
-kubectl create secret  generic nslogin --from-literal=username='nsroot' --from-literal=password='nsroot'
+kubectl create secret  generic nslogin --from-literal=username='<vpx_username>' --from-literal=password='<vpx_password>'
 ```
 
 After updating the required fields, create the Citrix Ingress Controller
